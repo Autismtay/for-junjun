@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="light dark" />
+  <title>给君君的一点点爱</title>
+  <meta name="description" content="一页简约、温柔、可访问的爱意文字。">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+  <a class="skip-link" href="#main">跳到正文</a>
+
+  <!-- 轻星光背景（纯装饰） -->
+  <div class="stars" aria-hidden="true"></div>
+
+  <header class="site-header" role="banner">
+    <div class="container">
+      <p class="kicker" aria-label="小标题">给 <span data-name="display">君君</span> 的一点点爱</p>
+      <h1 class="title">我把喜欢写成一页网页</h1>
+
+      <div class="actions" role="group" aria-label="页面操作">
+        <button id="toggleTheme" class="btn" type="button" aria-pressed="false">
+          切换深浅色
+        </button>
+        <button id="copyText" class="btn btn-ghost" type="button">
+          复制一段温柔
+        </button>
+      </div>
+      <p class="hint" id="status" aria-live="polite"></p>
+    </div>
+  </header>
+
+  <main id="main" class="container" role="main" tabindex="-1">
+    <section class="card" aria-labelledby="love-title">
+      <h2 id="love-title" class="section-title">写给 <span data-name="display">君君</span></h2>
+
+      <div class="love-text" id="loveText">
+        <p><span data-name="call">君君</span>，我喜欢你，不是因为你完美，而是因为你刚好是你。</p>
+        <p>你出现以后，平凡的日子都有了光。</p>
+        <p>我想把温柔留给你，把耐心给你，把坚定也给你。</p>
+        <p>如果世界有点吵，我就做你安静的避风港。</p>
+        <p>我们可以慢慢来，但我会一直在。</p>
+      </div>
+
+      <details class="more">
+        <summary>再多一点点</summary>
+        <ul>
+          <li>想起你时，我会不自觉地微笑。</li>
+          <li>你不说话也很好，我也愿意陪着。</li>
+          <li>你值得被认真对待，也值得被爱。</li>
+          <li>愿我们一起，把日子过成诗。</li>
+        </ul>
+      </details>
+
+      <!-- 惊喜按钮区 -->
+      <div class="surprise" aria-labelledby="surprise-title">
+        <h3 id="surprise-title" class="sr-only">惊喜</h3>
+
+        <button id="surpriseBtn" class="btn" type="button">
+          给我一个小惊喜
+        </button>
+
+        <p id="surpriseText" class="surprise-text" aria-live="polite"></p>
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="note-title">
+      <h2 id="note-title" class="section-title">小纸条</h2>
+
+      <form class="note" id="noteForm">
+        <label for="name">对方称呼（可改，默认：君君）</label>
+        <input id="name" name="name" type="text" autocomplete="nickname" />
+
+        <label for="msg">我想对你说（可选，保存在你浏览器里）</label>
+        <textarea id="msg" name="msg" rows="4" placeholder="写下你想说的话…"></textarea>
+
+        <div class="actions">
+          <button class="btn" type="submit">保存</button>
+          <button class="btn btn-ghost" type="button" id="clearNote">清空</button>
+        </div>
+      </form>
+
+      <p class="saved" id="savedPreview" aria-live="polite"></p>
+    </section>
+
+    <footer class="footer" role="contentinfo">
+      <p>愿你被温柔以待。</p>
+      <p class="small">支持键盘操作；若系统设置“减少动态效果”，页面会自动减少动画。</p>
+    </footer>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,185 @@
+(() => {
+  const root = document.documentElement;
+  const status = document.getElementById("status");
+
+  // ===== Theme =====
+  const THEME_KEY = "love_theme";
+  const btnTheme = document.getElementById("toggleTheme");
+
+  function setTheme(theme) {
+    if (theme) root.setAttribute("data-theme", theme);
+    else root.removeAttribute("data-theme");
+    localStorage.setItem(THEME_KEY, theme || "");
+    btnTheme.setAttribute("aria-pressed", theme === "dark" ? "true" : "false");
+  }
+
+  const savedTheme = localStorage.getItem(THEME_KEY) || "";
+  if (savedTheme === "dark") setTheme("dark");
+
+  btnTheme.addEventListener("click", () => {
+    const isDark = root.getAttribute("data-theme") === "dark";
+    setTheme(isDark ? "" : "dark");
+    status.textContent = isDark ? "已切换到浅色模式。" : "已切换到深色模式。";
+  });
+
+  // ===== Copy love text =====
+  const btnCopy = document.getElementById("copyText");
+  const loveText = document.getElementById("loveText");
+
+  btnCopy.addEventListener("click", async () => {
+    const text = loveText.innerText.trim();
+    try {
+      await navigator.clipboard.writeText(text);
+      status.textContent = "已复制：愿这份温柔落在你手心。";
+    } catch {
+      status.textContent = "复制失败：你的浏览器可能不支持剪贴板权限。";
+    }
+  });
+
+  // ===== Name + Note storage =====
+  const NOTE_KEY = "love_note";
+  const DEFAULT_NAME = "君君";
+
+  const form = document.getElementById("noteForm");
+  const inputName = document.getElementById("name");
+  const inputMsg = document.getElementById("msg");
+  const preview = document.getElementById("savedPreview");
+  const clearBtn = document.getElementById("clearNote");
+
+  const nameSlots = Array.from(document.querySelectorAll('[data-name="display"]'));
+  const nameCall = Array.from(document.querySelectorAll('[data-name="call"]'));
+
+  function applyName(name) {
+    const safeName = name || DEFAULT_NAME;
+    nameSlots.forEach(el => (el.textContent = safeName));
+    nameCall.forEach(el => (el.textContent = safeName));
+    document.title = `给${safeName}的一点点爱`;
+  }
+
+  function renderPreview(data) {
+    if (!data || (!data.name && !data.msg)) {
+      preview.textContent = "（还没有保存小纸条）";
+      return;
+    }
+    const who = data.name ? `给 ${data.name}：` : `给 ${DEFAULT_NAME}：`;
+    const msg = data.msg ? data.msg : "（空）";
+    preview.textContent = `${who} ${msg}`;
+  }
+
+  function loadNote() {
+    try {
+      const raw = localStorage.getItem(NOTE_KEY);
+      if (!raw) return null;
+      return JSON.parse(raw);
+    } catch {
+      return null;
+    }
+  }
+
+  function saveNote(note) {
+    localStorage.setItem(NOTE_KEY, JSON.stringify(note));
+  }
+
+  // init
+  const existing = loadNote();
+  const initName = (existing && existing.name) ? existing.name : DEFAULT_NAME;
+
+  inputName.value = initName;
+  if (existing && existing.msg) inputMsg.value = existing.msg;
+
+  applyName(initName);
+  renderPreview(existing);
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const name = inputName.value.trim() || DEFAULT_NAME;
+    const note = { name, msg: inputMsg.value.trim() };
+
+    saveNote(note);
+    applyName(name);
+    renderPreview(note);
+
+    status.textContent = "已保存。愿你被温柔抱紧。";
+  });
+
+  clearBtn.addEventListener("click", () => {
+    localStorage.removeItem(NOTE_KEY);
+    inputName.value = DEFAULT_NAME;
+    inputMsg.value = "";
+    applyName(DEFAULT_NAME);
+    renderPreview(null);
+    status.textContent = "已清空。";
+  });
+
+  // ===== Surprise (首次出现 + 状态提示 + 连点7次彩蛋) =====
+  const surpriseBtn = document.getElementById("surpriseBtn");
+  const surpriseText = document.getElementById("surpriseText");
+
+  const lines = [
+    "我不太会表达，但我很认真地喜欢你。",
+    "你一出现，我的世界就安静又明亮。",
+    "今天也想对你温柔一点，再温柔一点。",
+    "我想把所有的小确幸，都悄悄分你一半。",
+    "如果你累了，就靠一靠我。",
+    "你不用多好，我喜欢就好。",
+    "我会站在你这边，永远偏向你。",
+    "我想把“君君”两个字，写进每一个明天。",
+    "你是我藏在心里，轻轻发光的那件事。",
+    "不急，我们慢慢来。我一直在。"
+  ];
+
+  let hasShownOnce = false;
+  let clickCount = 0;
+  const EASTER_EGG_AT = 7;
+
+  function pickOne(arr) {
+    const i = Math.floor(Math.random() * arr.length);
+    return arr[i];
+  }
+
+  function getCurrentName() {
+    const name = (document.getElementById("name")?.value || "君君").trim();
+    return name || "君君";
+  }
+
+  function showSurprise() {
+    const name = getCurrentName();
+    clickCount += 1;
+
+    const first = !hasShownOnce;
+    if (first) {
+      hasShownOnce = true;
+      surpriseBtn.textContent = "再来一句";
+      surpriseBtn.setAttribute("aria-label", "再来一句惊喜");
+      status.textContent = "收到啦，给你一句温柔。";
+    } else {
+      status.textContent = "再给你一句。";
+    }
+
+    // 第 7 次触发彩蛋
+    let text = "";
+    if (clickCount === EASTER_EGG_AT) {
+      text = `${name}，我把认真藏在每一句“随机”里。`;
+      status.textContent = "你触发了一个小彩蛋。";
+    } else {
+      const raw = pickOne(lines);
+      text = raw.replaceAll("君君", name);
+    }
+
+    // 触发淡入动画：先移除再添加 class
+    surpriseText.classList.remove("is-show");
+    void surpriseText.offsetWidth; // reflow
+    surpriseText.textContent = text;
+    surpriseText.classList.add("is-show");
+
+    // 状态提示 3.5 秒后清空
+    window.clearTimeout(showSurprise._t);
+    showSurprise._t = window.setTimeout(() => {
+      status.textContent = "";
+    }, 3500);
+  }
+
+  if (surpriseBtn && surpriseText) {
+    surpriseBtn.addEventListener("click", showSurprise);
+  }
+})();
